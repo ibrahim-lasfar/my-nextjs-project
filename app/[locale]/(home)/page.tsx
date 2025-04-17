@@ -10,7 +10,6 @@ import {
   getAllCategories,
 } from '@/lib/actions/product.actions'
 import { getSetting } from '@/lib/actions/setting.actions'
-import { toSlug } from '@/lib/utils'
 import { getTranslations } from 'next-intl/server'
 
 export default async function HomePage() {
@@ -19,7 +18,10 @@ export default async function HomePage() {
   const todaysDeals = await getProductsByTag({ tag: 'todays-deal' })
   const bestSellingProducts = await getProductsByTag({ tag: 'best-seller' })
 
+  // جلب كل التصنيفات
   const categories = (await getAllCategories()).slice(0, 4)
+
+  // جلب المنتجات حسب التاجات
   const newArrivals = await getProductsForCard({
     tag: 'new-arrival',
   })
@@ -29,6 +31,7 @@ export default async function HomePage() {
   const bestSellers = await getProductsForCard({
     tag: 'best-seller',
   })
+
   const cards = [
     {
       title: t('Categories to explore'),
@@ -36,10 +39,10 @@ export default async function HomePage() {
         text: t('See More'),
         href: '/search',
       },
-      items: categories.map((category) => ({
-        name: category,
-        image: `/images/${toSlug(category)}.jpg`,
-        href: `/search?category=${category}`,
+      items: categories.map((category: any) => ({
+        name: category.name,
+        image: category.image, // 🔥 استخدم الصورة من قاعدة البيانات مباشرة
+        href: `/search?category=${category.name}`,
       })),
     },
     {

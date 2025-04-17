@@ -13,13 +13,6 @@ import { getSetting } from '@/lib/actions/setting.actions'
 import { toSlug } from '@/lib/utils'
 import { getTranslations } from 'next-intl/server'
 
-const getProductImage = (images: string[]): string => {
-  if (Array.isArray(images) && images.length > 0) {
-    return images[0]
-  }
-  return '/images/default-product-image.jpg'
-}
-
 export default async function HomePage() {
   const t = await getTranslations('Home')
   const { carousels } = await getSetting()
@@ -36,7 +29,6 @@ export default async function HomePage() {
   const bestSellers = await getProductsForCard({
     tag: 'best-seller',
   })
-
   const cards = [
     {
       title: t('Categories to explore'),
@@ -46,16 +38,13 @@ export default async function HomePage() {
       },
       items: categories.map((category) => ({
         name: category,
-        image: `/images/categories/${toSlug(category)}.jpg`, 
+        image: `/images/${toSlug(category)}.jpg`,
         href: `/search?category=${category}`,
       })),
     },
     {
       title: t('Explore New Arrivals'),
-      items: newArrivals.map((product) => ({
-        ...product,
-        image: getProductImage(product.images),
-      })),
+      items: newArrivals,
       link: {
         text: t('View All'),
         href: '/search?tag=new-arrival',
@@ -63,10 +52,7 @@ export default async function HomePage() {
     },
     {
       title: t('Discover Best Sellers'),
-      items: bestSellers.map((product) => ({
-        ...product,
-        image: getProductImage(product.images),
-      })),
+      items: bestSellers,
       link: {
         text: t('View All'),
         href: '/search?tag=new-arrival',
@@ -74,10 +60,7 @@ export default async function HomePage() {
     },
     {
       title: t('Featured Products'),
-      items: featureds.map((product) => ({
-        ...product,
-        image: getProductImage(product.images),
-      })),
+      items: featureds,
       link: {
         text: t('Shop Now'),
         href: '/search?tag=new-arrival',

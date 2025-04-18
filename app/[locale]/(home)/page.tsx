@@ -12,6 +12,23 @@ import {
 import { getSetting } from '@/lib/actions/setting.actions'
 import { getTranslations } from 'next-intl/server'
 
+// Define more specific interfaces
+interface ProductBase {
+  name: string
+  images?: string[]
+  slug: string
+  price?: number
+  description?: string
+  category?: string
+  tags?: string[]
+}
+
+interface CardItem {
+  name: string
+  image: string
+  href: string
+}
+
 export default async function HomePage() {
   const t = await getTranslations('Home')
   const { carousels } = await getSetting()
@@ -20,7 +37,7 @@ export default async function HomePage() {
 
   // Fetch the latest 4 products for Categories to explore
   const latestProducts = await getLatestProducts({ limit: 4 })
-  const categories = latestProducts.map((product) => ({
+  const categories = latestProducts.map((product: ProductBase): CardItem => ({
     name: product.name,
     image: Array.isArray(product.images) && product.images.length > 0 
       ? product.images[0] 
@@ -28,8 +45,7 @@ export default async function HomePage() {
     href: `/product/${product.slug}`,
   }))
 
-  const newArrivals = (await getProductsForCard({ tag: 'new-arrival' })).map((product) => ({
-    ...product,
+  const newArrivals = (await getProductsForCard({ tag: 'new-arrival' })).map((product: ProductBase): CardItem => ({
     name: product.name,
     image: Array.isArray(product.images) && product.images.length > 0 
       ? product.images[0] 
@@ -37,8 +53,7 @@ export default async function HomePage() {
     href: `/product/${product.slug}`,
   }))
 
-  const featureds = (await getProductsForCard({ tag: 'featured' })).map((product) => ({
-    ...product,
+  const featureds = (await getProductsForCard({ tag: 'featured' })).map((product: ProductBase): CardItem => ({
     name: product.name,
     image: Array.isArray(product.images) && product.images.length > 0 
       ? product.images[0] 
@@ -46,8 +61,7 @@ export default async function HomePage() {
     href: `/product/${product.slug}`,
   }))
 
-  const bestSellers = (await getProductsForCard({ tag: 'best-seller' })).map((product) => ({
-    ...product,
+  const bestSellers = (await getProductsForCard({ tag: 'best-seller' })).map((product: ProductBase): CardItem => ({
     name: product.name,
     image: Array.isArray(product.images) && product.images.length > 0 
       ? product.images[0] 

@@ -1,0 +1,23 @@
+# MGZon - Robots.txt
+# Managed by: Ibrahim Elasfar
+# Last Updated: 2025-04-18
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /private/
+Disallow: /account/
+
+# Block AI Crawlers
+User-agent: GPTBot
+Disallow: /
+User-agent: ChatGPT-User
+Disallow: /
+User-agent: Anthropic-ai
+Disallow: /
+User-agent: Claude-Web
+Disallow: /
+
+# Sitemaps
+Sitemap: https://mg-zon.vercel.app/sitemap.xml

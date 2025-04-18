@@ -8,6 +8,7 @@ import { routing } from '@/i18n/routing'
 import { notFound } from 'next/navigation'
 import { getSetting } from '@/lib/actions/setting.actions'
 import { cookies } from 'next/headers'
+import { Metadata } from 'next'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -19,10 +20,11 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 })
 
-export async function generateMetadata() {
+export async function generateMetadata(): Promise<Metadata> {
   const {
     site: { slogan, name, description, url },
   } = await getSetting()
+  
   return {
     title: {
       template: `%s | ${name}`,
@@ -30,6 +32,28 @@ export async function generateMetadata() {
     },
     description: description,
     metadataBase: new URL(url),
+    verification: {
+      google: 'PQo-i3w5jhSFT2MCdZxg0HnFOHDQ-iYMLNg8rYeFtXM',
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    openGraph: {
+      type: 'website',
+      locale: 'en_US',
+      url: url,
+      title: name,
+      description: description,
+      siteName: name,
+    },
   }
 }
 
@@ -44,9 +68,7 @@ export default async function AppLayout({
   const currencyCookie = (await cookies()).get('currency')
   const currency = currencyCookie ? currencyCookie.value : 'USD'
 
-  const { locale } = await params
-  // Ensure that the incoming `locale` is valid
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { locale } = params
   if (!routing.locales.includes(locale as any)) {
     notFound()
   }
@@ -58,6 +80,11 @@ export default async function AppLayout({
       dir={getDirection(locale) === 'rtl' ? 'rtl' : 'ltr'}
       suppressHydrationWarning
     >
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#ffffff" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+      </head>
       <body
         className={`min-h-screen ${geistSans.variable} ${geistMono.variable} antialiased`}
       >

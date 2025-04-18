@@ -11,15 +11,31 @@ const nextConfig: NextConfig = withNextIntl()({
       },
       {
         protocol: 'https',
-        hostname: 'mg-zon.vercel.app', // Replace with your actual production domain
+        hostname: 'mg-zon.vercel.app',
         port: '',
       },
       {
         protocol: 'http',
         hostname: 'localhost',
-        port: '3000', // Add localhost for development
+        port: '3000',
       },
     ],
+  },
+  poweredByHeader: false,
+  compress: true,
+  async headers() {
+    return [
+      {
+        source: '/:all*(svg|jpg|png)',
+        locale: false,
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, must-revalidate',
+          }
+        ],
+      },
+    ]
   },
 })
 

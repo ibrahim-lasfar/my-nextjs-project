@@ -1,7 +1,7 @@
-import type { NextConfig } from 'next'
-import withNextIntl from 'next-intl/plugin'
+const withNextIntl = require('next-intl/plugin')();
 
-const nextConfig: NextConfig = withNextIntl()({
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
     remotePatterns: [
       {
@@ -12,6 +12,11 @@ const nextConfig: NextConfig = withNextIntl()({
       {
         protocol: 'https',
         hostname: 'mg-zon.vercel.app',
+        port: '',
+      },
+      {
+        protocol: 'https',
+        hostname: 'hager-8k6rpw9fd-mark-lasfars-projects.vercel.app',
         port: '',
       },
       {
@@ -37,6 +42,6 @@ const nextConfig: NextConfig = withNextIntl()({
       },
     ]
   },
-})
+}
 
-export default nextConfig
+module.exports = withNextIntl(nextConfig)

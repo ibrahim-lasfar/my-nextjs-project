@@ -21,39 +21,50 @@ const geistMono = Geist_Mono({
 })
 
 export async function generateMetadata(): Promise<Metadata> {
-  const {
-    site: { slogan, name, description, url },
-  } = await getSetting()
-  
-  return {
-    title: {
-      template: `%s | ${name}`,
-      default: `${name}. ${slogan}`,
-    },
-    description: description,
-    metadataBase: new URL(url),
-    verification: {
-      google: 'PQo-i3w5jhSFT2MCdZxg0HnFOHDQ-iYMLNg8rYeFtXM',
-    },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
+  try {
+    const {
+      site: { slogan, name, description, url },
+    } = await getSetting()
+    
+    return {
+      title: {
+        template: `%s | ${name}`,
+        default: `${name}. ${slogan}`,
+      },
+      description,
+      metadataBase: new URL(url || 'https://hager-zon.vercel.app/'),
+      verification: {
+        google: 'PQo-i3w5jhSFT2MCdZxg0HnFOHDQ-iYMLNg8rYeFtXM',
+      },
+      robots: {
         index: true,
         follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
+        googleBot: {
+          index: true,
+          follow: true,
+          'max-video-preview': -1,
+          'max-image-preview': 'large',
+          'max-snippet': -1,
+        },
       },
-    },
-    openGraph: {
-      type: 'website',
-      locale: 'en_US',
-      url: url,
-      title: name,
-      description: description,
-      siteName: name,
-    },
+      openGraph: {
+        type: 'website',
+        locale: 'en_US',
+        url: url || 'https://hager-zon.vercel.app/',
+        title: name,
+        description,
+        siteName: name,
+      },
+    }
+  } catch (error) {
+    // Fallback metadata if settings fetch fails
+    return {
+      title: 'MGZon E-commerce',
+      description: 'Your ultimate shopping destination',
+      verification: {
+        google: 'PQo-i3w5jhSFT2MCdZxg0HnFOHDQ-iYMLNg8rYeFtXM',
+      },
+    }
   }
 }
 
@@ -65,7 +76,8 @@ export default async function AppLayout({
   children: React.ReactNode
 }) {
   const setting = await getSetting()
-  const currencyCookie = (await cookies()).get('currency')
+  const cookieStore = cookies()
+  const currencyCookie = cookieStore.get('currency')
   const currency = currencyCookie ? currencyCookie.value : 'USD'
 
   const { locale } = params

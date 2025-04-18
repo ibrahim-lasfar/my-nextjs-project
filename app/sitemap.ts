@@ -7,7 +7,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   try {
     await connectToDatabase()
     const { site: { url } } = await getSetting()
-    const baseUrl = url || 'https://hager-zon.vercel.app/'
+    const baseUrl = url || 'https://hager-zon.vercel.app'
     
     // Get all products
     const products = await Product.find({ isPublished: true })
@@ -37,26 +37,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }))
 
     return [...routes, ...productUrls]
-  } catch (error) {
+  } catch {
     // Fallback sitemap with just static routes
-    const baseUrl = 'https://hager-zon.vercel.app/'
+    const baseUrl = 'https://hager-zon.vercel.app'
     return [
       {
         url: baseUrl,
         lastModified: new Date(),
-        changeFrequency: 'daily',
+        changeFrequency: 'daily' as const,
         priority: 1,
       },
       {
         url: `${baseUrl}/search`,
         lastModified: new Date(),
-        changeFrequency: 'daily',
+        changeFrequency: 'daily' as const,
         priority: 0.8,
       },
       {
         url: `${baseUrl}/cart`,
         lastModified: new Date(),
-        changeFrequency: 'daily',
+        changeFrequency: 'daily' as const,
         priority: 0.8,
       },
     ]

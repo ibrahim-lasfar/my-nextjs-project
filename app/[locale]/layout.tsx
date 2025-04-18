@@ -56,7 +56,7 @@ export async function generateMetadata(): Promise<Metadata> {
         siteName: name,
       },
     }
-  } catch (error) {
+  } catch {
     // Fallback metadata if settings fetch fails
     return {
       title: 'MGZon E-commerce',
@@ -76,12 +76,12 @@ export default async function AppLayout({
   children: React.ReactNode
 }) {
   const setting = await getSetting()
-  const cookieStore = cookies()
+  const cookieStore = await cookies()
   const currencyCookie = cookieStore.get('currency')
   const currency = currencyCookie ? currencyCookie.value : 'USD'
 
   const { locale } = params
-  if (!routing.locales.includes(locale as any)) {
+  if (!routing.locales.includes(locale)) {
     notFound()
   }
   const messages = await getMessages()

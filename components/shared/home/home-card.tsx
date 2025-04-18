@@ -8,7 +8,6 @@ type CardItem = {
   link: { text: string; href: string }
   items: {
     name: string
-    items?: string[]
     image: string
     href: string
   }[]
@@ -23,11 +22,7 @@ export function HomeCard({ cards }: { cards: CardItem[] }) {
             <h3 className='text-xl font-bold mb-4'>{card.title}</h3>
             <div className='grid grid-cols-2 gap-4'>
               {card.items.map((item) => (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className='flex flex-col'
-                >
+                <Link key={item.name} href={item.href} className='flex flex-col'>
                   <Image
                     src={item.image}
                     alt={item.name}

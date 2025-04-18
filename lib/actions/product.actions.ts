@@ -40,6 +40,7 @@ export async function updateProduct(data: z.infer<typeof ProductUpdateSchema>) {
     return { success: false, message: formatError(error) }
   }
 }
+
 // DELETE
 export async function deleteProduct(id: string) {
   try {
@@ -55,6 +56,28 @@ export async function deleteProduct(id: string) {
     return { success: false, message: formatError(error) }
   }
 }
+
+// GET LATEST PRODUCTS
+export async function getLatestProducts({ limit = 4 }: { limit?: number } = {}) {
+  try {
+    await connectToDatabase()
+    const products = await Product.find({ isPublished: true })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .select('name images slug')
+      .lean()
+    
+    return JSON.parse(JSON.stringify(products)) as {
+      name: string
+      images: string[]
+      slug: string
+    }[]
+  } catch (error) {
+    console.error('Error fetching latest products:', error)
+    return []
+  }
+}
+
 // GET ONE PRODUCT BY ID
 export async function getProductById(productId: string) {
   await connectToDatabase()
@@ -127,6 +150,7 @@ export async function getAllCategories() {
   )
   return categories
 }
+
 export async function getProductsForCard({
   tag,
   limit = 4,
@@ -139,18 +163,17 @@ export async function getProductsForCard({
     { tags: { $in: [tag] }, isPublished: true },
     {
       name: 1,
-      href: { $concat: ['/product/', '$slug'] },
-      image: { $arrayElemAt: ['$images', 0] },
+      slug: 1,
+      images: 1,
     }
   )
     .sort({ createdAt: 'desc' })
     .limit(limit)
-  return JSON.parse(JSON.stringify(products)) as {
-    name: string
-    href: string
-    image: string
-  }[]
+    .lean()
+
+  return JSON.parse(JSON.stringify(products))
 }
+
 // GET PRODUCTS BY TAG
 export async function getProductsByTag({
   tag,
@@ -176,6 +199,7 @@ export async function getProductBySlug(slug: string) {
   if (!product) throw new Error('Product not found')
   return JSON.parse(JSON.stringify(product)) as IProduct
 }
+
 // GET RELATED PRODUCTS: PRODUCTS WITH SAME CATEGORY
 export async function getRelatedProductsByCategory({
   category,

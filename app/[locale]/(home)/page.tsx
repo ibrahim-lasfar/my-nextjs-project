@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import {
   getProductsForCard,
   getProductsByTag,
-  getAllCategories,
+  getLatestProducts,
 } from '@/lib/actions/product.actions'
 import { getSetting } from '@/lib/actions/setting.actions'
 import { getTranslations } from 'next-intl/server'
@@ -18,19 +18,42 @@ export default async function HomePage() {
   const todaysDeals = await getProductsByTag({ tag: 'todays-deal' })
   const bestSellingProducts = await getProductsByTag({ tag: 'best-seller' })
 
-  // جلب كل التصنيفات
-  const categories = (await getAllCategories()).slice(0, 4)
+  // Fetch the latest 4 products for Categories to explore
+  const latestProducts = await getLatestProducts({ limit: 4 })
+  const categories = latestProducts.map((product) => ({
+    name: product.name,
+    image: Array.isArray(product.images) && product.images.length > 0 
+      ? product.images[0] 
+      : '/images/fallback.jpg',
+    href: `/product/${product.slug}`,
+  }))
 
-  // جلب المنتجات حسب التاجات
-  const newArrivals = await getProductsForCard({
-    tag: 'new-arrival',
-  })
-  const featureds = await getProductsForCard({
-    tag: 'featured',
-  })
-  const bestSellers = await getProductsForCard({
-    tag: 'best-seller',
-  })
+  const newArrivals = (await getProductsForCard({ tag: 'new-arrival' })).map((product) => ({
+    ...product,
+    name: product.name,
+    image: Array.isArray(product.images) && product.images.length > 0 
+      ? product.images[0] 
+      : '/images/fallback.jpg',
+    href: `/product/${product.slug}`,
+  }))
+
+  const featureds = (await getProductsForCard({ tag: 'featured' })).map((product) => ({
+    ...product,
+    name: product.name,
+    image: Array.isArray(product.images) && product.images.length > 0 
+      ? product.images[0] 
+      : '/images/fallback.jpg',
+    href: `/product/${product.slug}`,
+  }))
+
+  const bestSellers = (await getProductsForCard({ tag: 'best-seller' })).map((product) => ({
+    ...product,
+    name: product.name,
+    image: Array.isArray(product.images) && product.images.length > 0 
+      ? product.images[0] 
+      : '/images/fallback.jpg',
+    href: `/product/${product.slug}`,
+  }))
 
   const cards = [
     {
@@ -39,11 +62,7 @@ export default async function HomePage() {
         text: t('See More'),
         href: '/search',
       },
-      items: categories.map((category: any) => ({
-        name: category.name,
-        image: category.image, // 🔥 استخدم الصورة من قاعدة البيانات مباشرة
-        href: `/search?category=${category.name}`,
-      })),
+      items: categories,
     },
     {
       title: t('Explore New Arrivals'),
@@ -58,7 +77,7 @@ export default async function HomePage() {
       items: bestSellers,
       link: {
         text: t('View All'),
-        href: '/search?tag=new-arrival',
+        href: '/search?tag=best-seller',
       },
     },
     {
@@ -66,7 +85,7 @@ export default async function HomePage() {
       items: featureds,
       link: {
         text: t('Shop Now'),
-        href: '/search?tag=new-arrival',
+        href: '/search?tag=featured',
       },
     },
   ]

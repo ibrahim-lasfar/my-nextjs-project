@@ -22,35 +22,51 @@ const ProductCard = ({
   hideBorder?: boolean
   hideAddToCart?: boolean
 }) => {
-  const ProductImage = () => (
-    <Link href={`/product/${product.slug}`}>
-      <div className='relative h-52'>
-        {product.images.length > 1 ? (
-          <ImageHover
-            src={product.images[0]}
-            hoverSrc={product.images[1]}
-            alt={product.name}
-          />
-        ) : (
-          <div className='relative h-52'>
-            <Image
+  const ProductImage = () => {
+    const hasImages = Array.isArray(product.images) && product.images.length > 0
+    const fallbackImage = '/images/fallback.jpg' // Provide a fallback image
+
+    return (
+      <Link href={`/product/${product.slug}`}>
+        <div className="relative h-52">
+          {hasImages && product.images.length > 1 ? (
+            <ImageHover
               src={product.images[0]}
+              hoverSrc={product.images[1]}
               alt={product.name}
-              fill
-              sizes='80vw'
-              className='object-contain'
             />
-          </div>
-        )}
-      </div>
-    </Link>
-  )
+          ) : hasImages ? (
+            <div className="relative h-52">
+              <Image
+                src={product.images[0]}
+                alt={product.name}
+                fill
+                sizes="80vw"
+                className="object-contain"
+              />
+            </div>
+          ) : (
+            <div className="relative h-52">
+              <Image
+                src={fallbackImage}
+                alt={`${product.name} (Fallback Image)`}
+                fill
+                sizes="80vw"
+                className="object-contain"
+              />
+            </div>
+          )}
+        </div>
+      </Link>
+    )
+  }
+
   const ProductDetails = () => (
-    <div className='flex-1 space-y-2'>
-      <p className='font-bold'>{product.brand}</p>
+    <div className="flex-1 space-y-2">
+      <p className="font-bold">{product.brand}</p>
       <Link
         href={`/product/${product.slug}`}
-        className='overflow-hidden text-ellipsis'
+        className="overflow-hidden text-ellipsis"
         style={{
           display: '-webkit-box',
           WebkitLineClamp: 2,
@@ -59,46 +75,47 @@ const ProductCard = ({
       >
         {product.name}
       </Link>
-      <div className='flex gap-2 justify-center'>
+      <div className="flex gap-2 justify-center">
         <Rating rating={product.avgRating} />
         <span>({formatNumber(product.numReviews)})</span>
       </div>
 
       <ProductPrice
-        isDeal={product.tags.includes('todays-deal')}
+        isDeal={Array.isArray(product.tags) && product.tags.includes('todays-deal')} // Ensure tags is valid
         price={product.price}
         listPrice={product.listPrice}
         forListing
       />
     </div>
   )
+
   const AddButton = () => (
-    <div className='w-full text-center'>
+    <div className="w-full text-center">
       <AddToCart
         minimal
         item={{
           clientId: generateId(),
           product: product._id,
-          size: product.sizes[0],
-          color: product.colors[0],
+          size: product.sizes?.[0] || 'N/A', // Ensure size exists
+          color: product.colors?.[0] || 'N/A', // Ensure color exists
           countInStock: product.countInStock,
           name: product.name,
           slug: product.slug,
           category: product.category,
           price: round2(product.price),
           quantity: 1,
-          image: product.images[0],
+          image: Array.isArray(product.images) && product.images.length > 0 ? product.images[0] : '/images/fallback.jpg',
         }}
       />
     </div>
   )
 
   return hideBorder ? (
-    <div className='flex flex-col'>
+    <div className="flex flex-col">
       <ProductImage />
       {!hideDetails && (
         <>
-          <div className='p-3 flex-1 text-center'>
+          <div className="p-3 flex-1 text-center">
             <ProductDetails />
           </div>
           {!hideAddToCart && <AddButton />}
@@ -106,16 +123,16 @@ const ProductCard = ({
       )}
     </div>
   ) : (
-    <Card className='flex flex-col  '>
-      <CardHeader className='p-3'>
+    <Card className="flex flex-col">
+      <CardHeader className="p-3">
         <ProductImage />
       </CardHeader>
       {!hideDetails && (
         <>
-          <CardContent className='p-3 flex-1  text-center'>
+          <CardContent className="p-3 flex-1 text-center">
             <ProductDetails />
           </CardContent>
-          <CardFooter className='p-3'>
+          <CardFooter className="p-3">
             {!hideAddToCart && <AddButton />}
           </CardFooter>
         </>

@@ -8,8 +8,8 @@ body {
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 20 14.3% 4.1%;
+    --background: 0 0% 100%; /* Light mode background */
+    --foreground: 20 14.3% 4.1%; /* Light mode foreground */
     --card: 0 0% 100%;
     --card-foreground: 20 14.3% 4.1%;
     --popover: 0 0% 100%;
@@ -24,7 +24,7 @@ body {
     --accent-foreground: 24 9.8% 10%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 60 9.1% 97.8%;
-    --border: 20 5.9% 90%;
+    --border: 20 5.9% 90%; /* Light mode border color */
     --input: 20 5.9% 90%;
     --ring: 20 14.3% 4.1%;
     --radius: 0.5rem;
@@ -36,8 +36,8 @@ body {
   }
 
   .dark {
-    --background: 20 14.3% 4.1%;
-    --foreground: 60 9.1% 97.8%;
+    --background: 20 14.3% 4.1%; /* Dark mode background */
+    --foreground: 60 9.1% 97.8%; /* Dark mode foreground */
     --card: 20 14.3% 4.1%;
     --card-foreground: 60 9.1% 97.8%;
     --popover: 20 14.3% 4.1%;
@@ -52,7 +52,7 @@ body {
     --accent-foreground: 60 9.1% 97.8%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 60 9.1% 97.8%;
-    --border: 12 6.5% 15.1%;
+    --border: 12 6.5% 15.1%; /* Dark mode border color */
     --input: 12 6.5% 15.1%;
     --ring: 35.5 91.7% 32.9%;
     --chart-1: 220 70% 50%;
@@ -61,37 +61,54 @@ body {
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
-}
 
-@layer base {
+  .bg-background {
+    background-color: hsl(var(--background));
+  }
+
+  .text-foreground {
+    color: hsl(var(--foreground));
+  }
+
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
 @layer utilities {
+  .border-border {
+    border-color: hsl(var(--border)); /* Define the border-border class */
+  }
+
   .web-page-content p {
     @apply py-2;
   }
+
   .highlight-link a,
   a.highlight-link {
-    @apply text-sky-700  hover:text-orange-700 hover:underline;
+    @apply text-sky-700 hover:text-orange-700 hover:underline;
   }
+
   .header-button {
     @apply cursor-pointer p-1 border border-transparent hover:border-white rounded-[2px];
   }
+
   .item-button {
     @apply p-3 hover:bg-muted hover:no-underline;
   }
+
   .h1-bold {
     @apply font-bold text-2xl lg:text-3xl;
   }
+
   .h2-bold {
     @apply font-bold text-lg lg:text-xl;
   }
+
   .flex-between {
     @apply flex justify-between items-center;
   }

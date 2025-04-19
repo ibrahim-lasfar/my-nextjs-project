@@ -1,5 +1,6 @@
 import createMiddleware from 'next-intl/middleware'
 import { routing } from './i18n/routing'
+
 import NextAuth from 'next-auth'
 import authConfig from './auth.config'
 
@@ -12,13 +13,10 @@ const publicPages = [
   '/cart/(.*)',
   '/product/(.*)',
   '/page/(.*)',
+  // (/secret requires auth)
 ]
 
-const intlMiddleware = createMiddleware({
-  ...routing,
-  defaultLocale: 'en-US'
-})
-
+const intlMiddleware = createMiddleware(routing)
 const { auth } = NextAuth(authConfig)
 
 export default auth((req) => {
@@ -31,6 +29,7 @@ export default auth((req) => {
   const isPublicPage = publicPathnameRegex.test(req.nextUrl.pathname)
 
   if (isPublicPage) {
+    // return NextResponse.next()
     return intlMiddleware(req)
   } else {
     if (!req.auth) {
@@ -48,5 +47,6 @@ export default auth((req) => {
 })
 
 export const config = {
-  matcher: ['/((?!api|_next|.*\\..*).*)']
+  // Skip all paths that should not be internationalized
+  matcher: ['/((?!api|_next|.*\\..*).*)'],
 }

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+'use client'
+import React, { useEffect, useRef } from 'react'
 import useSettingStore from '@/hooks/use-setting-store'
 import { ClientSetting } from '@/types'
 
@@ -9,16 +10,14 @@ export default function AppInitializer({
   setting: ClientSetting
   children: React.ReactNode
 }) {
-  const [rendered, setRendered] = useState(false)
+  const initialized = useRef(false)
 
   useEffect(() => {
-    setRendered(true)
+    if (!initialized.current) {
+      useSettingStore.setState({ setting })
+      initialized.current = true
+    }
   }, [setting])
-  if (!rendered) {
-    useSettingStore.setState({
-      setting,
-    })
-  }
 
   return children
 }

@@ -10,5 +10,9 @@ export const i18n = {
 export const getDirection = (locale: string) => {
   return locale === 'ar' ? 'rtl' : 'ltr'
 }
+
 export type I18nConfig = typeof i18n
 export type Locale = I18nConfig['locales'][number]
+
+// Add this default export
+export default i18n

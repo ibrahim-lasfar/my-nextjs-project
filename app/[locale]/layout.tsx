@@ -20,12 +20,26 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 })
 
-export async function generateMetadata(): Promise<Metadata> {
+// Helper function to validate locale
+function validateLocale(locale: string) {
+  if (!routing.locales.includes(locale as any)) {
+    notFound()
+  }
+  return locale
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}): Promise<Metadata> {
   try {
-    const {
-      site: { slogan, name, description, url },
-    } = await getSetting()
+    // Wait for params to be available
+    const { locale } = await params
+    const validLocale = validateLocale(locale)
     
+    const { site: { slogan, name, description, url } } = await getSetting()
+
     return {
       title: {
         template: `%s | ${name}`,
@@ -49,15 +63,14 @@ export async function generateMetadata(): Promise<Metadata> {
       },
       openGraph: {
         type: 'website',
-        locale: 'en_US',
+        locale: validLocale,
         url: url || 'https://hager-zon.vercel.app/',
         title: name,
         description,
         siteName: name,
       },
     }
-  } catch {
-    // Fallback metadata if settings fetch fails
+  } catch (error) {
     return {
       title: 'MGZon E-commerce',
       description: 'Your ultimate shopping destination',
@@ -69,43 +82,52 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AppLayout({
-  params,
   children,
+  params,
 }: {
-  params: { locale: string }
   children: React.ReactNode
+  params: Promise<{ locale: string }>
 }) {
-  const setting = await getSetting()
-  const cookieStore = await cookies()
-  const currencyCookie = cookieStore.get('currency')
-  const currency = currencyCookie ? currencyCookie.value : 'USD'
+  try {
+    // Wait for params to be available
+    const { locale } = await params
+    const validLocale = validateLocale(locale)
 
-  const { locale } = params
-  if (!routing.locales.includes(locale)) {
+    // Get all async data in parallel
+    const [setting, cookieStore, messages] = await Promise.all([
+      getSetting(),
+      cookies(),
+      getMessages()
+    ])
+
+    // Get currency after cookieStore is available
+    const currencyCookie = await cookieStore.get('currency')
+    const currency = currencyCookie?.value || 'USD'
+
+    return (
+      <html
+        lang={validLocale}
+        dir={getDirection(validLocale) === 'rtl' ? 'rtl' : 'ltr'}
+        suppressHydrationWarning
+      >
+        <head>
+          <link rel="manifest" href="/manifest.json" />
+          <meta name="theme-color" content="#ffffff" />
+          <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        </head>
+        <body
+          className={`min-h-screen ${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <NextIntlClientProvider locale={validLocale} messages={messages}>
+            <ClientProviders setting={{ ...setting, currency }}>
+              {children}
+            </ClientProviders>
+          </NextIntlClientProvider>
+        </body>
+      </html>
+    )
+  } catch (error) {
+    console.error('Layout error:', error)
     notFound()
   }
-  const messages = await getMessages()
-
-  return (
-    <html
-      lang={locale}
-      dir={getDirection(locale) === 'rtl' ? 'rtl' : 'ltr'}
-      suppressHydrationWarning
-    >
-      <head>
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#ffffff" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-      </head>
-      <body
-        className={`min-h-screen ${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <ClientProviders setting={{ ...setting, currency }}>
-            {children}
-          </ClientProviders>
-        </NextIntlClientProvider>
-      </body>
-    </html>
-  )
 }
